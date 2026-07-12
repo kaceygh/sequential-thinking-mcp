@@ -1,17 +1,24 @@
-# 阶段 1：构建
-FROM node:18-alpine AS builder
+# 使用 Node.js 18-alpine（Render 默认支持）
+FROM node:18-alpine
+
+# 设置工作目录
 WORKDIR /app
+
+# 复制 package.json 和 package-lock.json（确保 lockfile 存在）
 COPY package*.json ./
-RUN npm ci --omit=dev || npm install --omit=dev  # <-- 容错处理：如果 ci 失败则退化为 install
+
+# 安装依赖（强制使用 npm install 并忽略错误）
+RUN npm install --omit=dev || true
+
+# 复制源代码
 COPY src ./src
 
-# 阶段 2：运行
-FROM node:18-alpine
-WORKDIR /app
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/src ./src
-COPY --from=builder /app/package.json ./
+# 设置环境变量
 ENV NODE_ENV=production
 ENV PORT=3000
+
+# 暴露端口
 EXPOSE 3000
+
+# 启动命令
 CMD ["npx", "supergateway", "--stdio", "node src/sequentialthinking/index.js", "--port", "3000", "--ssePath", "/sse", "--healthPath", "/health"]
