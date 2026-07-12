@@ -3,62 +3,70 @@ import { HttpServerTransport } from "@modelcontextprotocol/sdk/server/http.js";
 import { z } from "zod";
 import http from 'http';
 
-// 创建 MCP 服务器
-const server = new McpServer({
-  name: "sequential-thinking",
-  version: "1.0.0",
-});
+// 打印启动日志（帮助调试）
+console.log("🚀 Starting MCP Server...");
 
-// 注册工具
-server.tool(
-  "sequential_thinking",
-  "结构化逐步推理工具",
-  {
-    thought: z.string(),
-    nextThoughtNeeded: z.boolean(),
-    thoughtNumber: z.number().int().positive(),
-    totalThoughts: z.number().int().positive(),
-    isRevision: z.boolean().optional(),
-    revisesThought: z.number().int().positive().optional(),
-    branchFromThought: z.number().int().positive().optional(),
-    branchId: z.string().optional(),
-    needsMoreThoughts: z.boolean().optional(),
-  },
-  async (args) => ({
-    content: [{
-      type: "text",
-      text: JSON.stringify({
-        acknowledged: true,
-        thoughtNumber: args.thoughtNumber,
-        totalThoughts: args.totalThoughts,
-        nextThoughtNeeded: args.nextThoughtNeeded,
-        branchId: args.branchId,
-      })
-    }],
-  })
-);
+try {
+  // 创建 MCP 服务器
+  const server = new McpServer({
+    name: "sequential-thinking",
+    version: "1.0.0",
+  });
 
-// 创建 HTTP 服务器
-const httpServer = http.createServer();
+  // 注册工具
+  server.tool(
+    "sequential_thinking",
+    "结构化逐步推理工具",
+    {
+      thought: z.string(),
+      nextThoughtNeeded: z.boolean(),
+      thoughtNumber: z.number().int().positive(),
+      totalThoughts: z.number().int().positive(),
+      isRevision: z.boolean().optional(),
+      revisesThought: z.number().int().positive().optional(),
+      branchFromThought: z.number().int().positive().optional(),
+      branchId: z.string().optional(),
+      needsMoreThoughts: z.boolean().optional(),
+    },
+    async (args) => ({
+      content: [{
+        type: "text",
+        text: JSON.stringify({
+          acknowledged: true,
+          thoughtNumber: args.thoughtNumber,
+          totalThoughts: args.totalThoughts,
+          nextThoughtNeeded: args.nextThoughtNeeded,
+          branchId: args.branchId,
+        })
+      }],
+    })
+  );
 
-// 将 MCP 服务器绑定到 HTTP 服务器
-const transport = new HttpServerTransport(httpServer);
-await server.connect(transport);
+  // 创建 HTTP 服务器
+  const httpServer = http.createServer();
 
-// 集成健康检查路由
-httpServer.on('request', (req, res) => {
-  if (req.url === '/health' && req.method === 'GET') {
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ status: 'ok' }));
-    return;
-  }
-  // 其他路由交给 MCP 处理（如 /sse）
-  res.writeHead(404);
-  res.end();
-});
+  // 将 MCP 服务器绑定到 HTTP 服务器
+  const transport = new HttpServerTransport(httpServer);
+  await server.connect(transport);
 
-// 启动服务器（使用 Render 提供的 PORT 环境变量）
-const PORT = process.env.PORT || 3000;
-httpServer.listen(PORT, () => {
-  console.log(`✅ MCP Server running on port ${PORT}`);
-});
+  // 集成健康检查路由
+  httpServer.on('request', (req, res) => {
+    if (req.url === '/health' && req.method === 'GET') {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ status: 'ok' }));
+      return;
+    }
+    res.writeHead(404);
+    res.end();
+  });
+
+  // 启动服务器
+  const PORT = process.env.PORT || 3000;
+  httpServer.listen(PORT, () => {
+    console.log(`✅ MCP Server running on port ${PORT}`);
+  });
+
+} catch (error) {
+  console.error("❌ Failed to start MCP Server:", error);
+  process.exit(1); // 确保退出码为 1（与 Render 日志一致）
+}
