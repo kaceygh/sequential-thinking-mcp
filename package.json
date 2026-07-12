@@ -10,10 +10,10 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
-    "supergateway": "latest",  // ✅ 使用最新版本
+    "supergateway": "1.0.2",
     "zod": "^3.22.4"
   },
-  "resolutions": {  // ✅ 强制锁定依赖版本（可选）
+  "overrides": {
     "supergateway": "1.0.2"
   }
 }
