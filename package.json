@@ -1,15 +1,16 @@
 {
-  "name": "sequential-thinking-mcp-server",
+  "name": "sequential-thinking-mcp",
   "version": "1.0.0",
   "type": "module",
-  "main": "src/sequentialthinking/index.js",
+  "engines": {
+    "node": "18.x"  // <-- 改为 18.x（Render 默认版本，兼容性更好）
+  },
   "scripts": {
-    "start": "node src/sequentialthinking/index.js",
-    "dev": "node --watch src/sequentialthinking/index.js"
+    "start": "node src/sequentialthinking/index.js"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
-    "supergateway": "^1.0.0"
-  },
-  "engines": { "node": ">=20" }
+    "supergateway": "^1.0.0",
+    "zod": "^3.22.4"  // <-- 明确加上 zod 依赖
+  }
 }
