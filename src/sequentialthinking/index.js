@@ -1,29 +1,15 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { HttpServerTransport } from "@modelcontextprotocol/sdk/server/http.js";
 import { z } from "zod";
 import http from 'http';
 
-// 创建 HTTP 服务器专门处理健康检查
-const healthServer = http.createServer((req, res) => {
-  if (req.url === '/health' && req.method === 'GET') {
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ status: 'ok' }));
-    return;
-  }
-  res.writeHead(404);
-  res.end();
-});
-
-// 监听健康检查端口（与主服务不同端口）
-healthServer.listen(10000, () => {
-  console.log('✅ Health check server running on port 10000');
-});
-
+// 创建 MCP 服务器
 const server = new McpServer({
   name: "sequential-thinking",
   version: "1.0.0",
 });
 
+// 注册工具
 server.tool(
   "sequential_thinking",
   "结构化逐步推理工具",
@@ -52,6 +38,27 @@ server.tool(
   })
 );
 
-const transport = new StdioServerTransport();
+// 创建 HTTP 服务器
+const httpServer = http.createServer();
+
+// 将 MCP 服务器绑定到 HTTP 服务器
+const transport = new HttpServerTransport(httpServer);
 await server.connect(transport);
-console.log("✅ MCP Server running on stdio");
+
+// 集成健康检查路由
+httpServer.on('request', (req, res) => {
+  if (req.url === '/health' && req.method === 'GET') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ status: 'ok' }));
+    return;
+  }
+  // 其他路由交给 MCP 处理（如 /sse）
+  res.writeHead(404);
+  res.end();
+});
+
+// 启动服务器（使用 Render 提供的 PORT 环境变量）
+const PORT = process.env.PORT || 3000;
+httpServer.listen(PORT, () => {
+  console.log(`✅ MCP Server running on port ${PORT}`);
+});
