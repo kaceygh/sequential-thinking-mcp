@@ -6,6 +6,7 @@ import { z } from "zod";
 const server = new McpServer({
   name: "sequential-thinking",
   version: "1.0.0",
+  healthCheck: () => ({ status: "ok" })
 });
 
 server.tool(
