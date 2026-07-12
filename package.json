@@ -3,14 +3,17 @@
   "version": "1.0.0",
   "type": "module",
   "engines": {
-    "node": "18.x"  // Render 默认 Node.js 版本
+    "node": "18.x"
   },
   "scripts": {
     "start": "node src/sequentialthinking/index.js"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
-    "supergateway": "^1.0.2",  // ✅ 改为可用版本
+    "supergateway": "latest",  // ✅ 使用最新版本
     "zod": "^3.22.4"
+  },
+  "resolutions": {  // ✅ 强制锁定依赖版本（可选）
+    "supergateway": "1.0.2"
   }
 }
