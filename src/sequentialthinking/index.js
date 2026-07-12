@@ -47,6 +47,9 @@ server.tool(
   }
 );
 
+const port = process.env.PORT || 3000;
+console.log(`Server will run on port: ${port}`);
+
 const transport = new StdioServerTransport();
 await server.connect(transport);
 console.error("✅ Sequential Thinking MCP Server running on stdio");
