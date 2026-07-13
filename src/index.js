@@ -1,3 +1,4 @@
+// src/index.js - 正确的 stdio 版本
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
