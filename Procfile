@@ -1,1 +1,1 @@
-web: node index.js --healthPath /health
+web: npm start

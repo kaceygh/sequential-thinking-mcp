@@ -1,20 +1,15 @@
 {
   "name": "sequential-thinking-mcp",
   "version": "1.0.0",
-  "description": "Sequential Thinking MCP Server with Remote HTTP/SSE Transport",
-  "type": "module",
-  "main": "index.js",
-  "scripts": {
-    "start": "node index.js",
-    "dev": "node --watch index.js"
-  },
-  "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.0.0",
-    "cors": "^2.8.5",
-    "express": "^4.19.2",
-    "supergateway": "1.0.0"
-  },
+  "description": "Sequential Thinking MCP Server for dcdeploy",
+  "private": true,
   "engines": {
     "node": "20.x"
+  },
+  "dependencies": {
+    "supergateway": "^1.0.0"
+  },
+  "scripts": {
+    "start": "supergateway --stdio \"npx -y @modelcontextprotocol/server-sequential-thinking\" --port $PORT --healthPath /health --ssePath /sse"
   }
 }
